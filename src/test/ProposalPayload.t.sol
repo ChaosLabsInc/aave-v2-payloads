@@ -46,6 +46,53 @@ contract ProposalPayloadTest is Test {
         );
     }
 
+    function testNoPaymentInitial6Months() public {
+        uint256 initialCHAOSAusdcBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
+        // Capturing next Stream IDs before proposal is executed
+        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
+
+        // Pass vote and execute proposal
+        GovHelpers.passVoteAndExecute(vm, proposalId);
+
+        // Checking if the streams have been created properly
+        // aUSDC stream
+        (
+            address senderAusdc,
+            address recipientAusdc,
+            uint256 depositAusdc,
+            address tokenAddressAusdc,
+            uint256 startTimeAusdc,
+            uint256 stopTimeAusdc,
+            uint256 remainingBalanceAusdc,
+            uint256 ratePerSecondAusdc
+        ) = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID);
+
+        assertEq(senderAusdc, AAVE_MAINNET_RESERVE_FACTOR);
+        assertEq(recipientAusdc, CHAOS_RECIPIENT);
+        assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
+        assertEq(tokenAddressAusdc, address(AUSDC));
+        assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_END - STREAMS_START);
+        assertEq(remainingBalanceAusdc, AUSDC_STREAM_AMOUNT);
+
+        // Checking if Chaos can withdraw from streams
+        vm.startPrank(CHAOS_RECIPIENT);
+        // Checking Chaos withdrawal every 30 days over 12 month period
+        uint256 withdrawals = 0;
+        for (uint256 i = 0; i < NO_PAYMENT_RANGE; i++) {
+            vm.warp(block.timestamp + 30 days);
+            // First 6 months 0 payment
+            // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+            // Checking aUSDC stream amount
+            assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+            assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+            // Withdrawl with 0 amount throws exception:
+            // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L282
+        }
+        assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+        assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+        vm.stopPrank();
+    }
+
     function testExecute() public {
         uint256 initialCHAOSAusdcBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
         // Capturing next Stream IDs before proposal is executed

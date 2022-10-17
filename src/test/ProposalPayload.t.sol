@@ -46,6 +46,7 @@ contract ProposalPayloadTest is Test {
         );
     }
 
+    // First 6 months, stream transfers 0 funds.
     function testNoPaymentInitial6Months() public {
         uint256 initialCHAOSAusdcBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
         // Capturing next Stream IDs before proposal is executed
@@ -93,6 +94,7 @@ contract ProposalPayloadTest is Test {
         vm.stopPrank();
     }
 
+    // Full Payment Term Test. Stream only works months 6-12.
     function testExecute() public {
         uint256 initialCHAOSAusdcBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
         // Capturing next Stream IDs before proposal is executed

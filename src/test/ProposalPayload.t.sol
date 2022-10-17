@@ -20,14 +20,16 @@ contract ProposalPayloadTest is Test {
     IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
 
     address public immutable AAVE_MAINNET_RESERVE_FACTOR = AaveV2Ethereum.COLLECTOR;
-    address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
-    address public constant CHAOS_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
+    address public constant CHAOS_RECIPIENT = 0x866505a747D958b21E56D516DA61f13949949C2d; // TODO: Replace with actual recipient
 
     IStreamable public immutable STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
-    IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
 
-    uint256 public constant AUSDC_STREAM_AMOUNT = 500026624000;
-    uint256 public constant STREAMS_DURATION = 180 days;
+    uint256 public constant AUSDC_STREAM_AMOUNT = 500000e6 + 12352000;
+    // 12 months of 30 days
+    uint256 public constant STREAMS_END = 360 days; // 6 months duration from start
+    uint256 public constant STREAMS_START = 180 days; // in 6 months
+    uint256 public constant NO_PAYMENT_RANGE = 6;
+    uint256 public constant ENGAGEMENT_RANGE = 12;
 
     function setUp() public {
         // To fork at a specific block: vm.createSelectFork(vm.rpcUrl("mainnet", BLOCK_NUMBER));
@@ -45,23 +47,12 @@ contract ProposalPayloadTest is Test {
     }
 
     function testExecute() public {
-        uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
         uint256 initialCHAOSAusdcBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
-
         // Capturing next Stream IDs before proposal is executed
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
-        uint256 nextEcosystemReserveStreamID = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getNextStreamId();
 
         // Pass vote and execute proposal
         GovHelpers.passVoteAndExecute(vm, proposalId);
-
-        // Checking upfront aUSDC payment of $0.35 million
-        assertLe(
-            initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
-            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR)
-        );
-        // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
-        assertApproxEqAbs(initialCHAOSAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(CHAOS_RECIPIENT), 1);
 
         // Checking if the streams have been created properly
         // aUSDC stream
@@ -80,39 +71,49 @@ contract ProposalPayloadTest is Test {
         assertEq(recipientAusdc, CHAOS_RECIPIENT);
         assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
         assertEq(tokenAddressAusdc, address(AUSDC));
-        assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_DURATION);
+        assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_END - STREAMS_START);
         assertEq(remainingBalanceAusdc, AUSDC_STREAM_AMOUNT);
 
-        // Checking if CHAOS can withdraw from streams
+        // Checking if Chaos can withdraw from streams
         vm.startPrank(CHAOS_RECIPIENT);
-        // Checking CHAOS withdrawal every 30 days over 12 month period
-        for (uint256 i = 0; i < 12; i++) {
+        // Checking Chaos withdrawal every 30 days over 12 month period
+        uint256 withdrawlTimes = 0;
+        for (uint256 i = 0; i < ENGAGEMENT_RANGE; i++) {
             vm.warp(block.timestamp + 30 days);
-
-            uint256 currentAusdcCHAOSBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
-            uint256 currentAusdcCHAOSStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
+            if (i < NO_PAYMENT_RANGE) {
+                //Withdrawl with 0 amount throws exception:
+                // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L282
+                continue;
+            }
+            withdrawlTimes++;
+            uint256 currentAusdcChaosBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
+            uint256 currentAusdcChaosStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
                 nextMainnetReserveFactorStreamID,
                 CHAOS_RECIPIENT
             );
 
             STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.withdrawFromStream(
                 nextMainnetReserveFactorStreamID,
-                currentAusdcCHAOSStreamBalance
+                currentAusdcChaosStreamBalance
             );
 
             // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
             // Checking aUSDC stream amount
             assertApproxEqAbs(
                 AUSDC.balanceOf(CHAOS_RECIPIENT),
-                currentAusdcCHAOSBalance + currentAusdcCHAOSStreamBalance,
+                currentAusdcChaosBalance + currentAusdcChaosStreamBalance,
                 1
             );
             assertApproxEqAbs(
                 AUSDC.balanceOf(CHAOS_RECIPIENT),
-                currentAusdcCHAOSBalance + (ratePerSecondAusdc * 30 days),
+                currentAusdcChaosBalance + (ratePerSecondAusdc * 30 days),
                 1
             );
         }
+
+        //check final numbers:
+        assertEq(withdrawlTimes, 6);
+        assertEq(AUSDC.balanceOf(CHAOS_RECIPIENT) >= initialCHAOSAusdcBalance + AUSDC_STREAM_AMOUNT, true);
         vm.stopPrank();
     }
 }

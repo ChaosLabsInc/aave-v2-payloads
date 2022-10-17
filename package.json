@@ -1,7 +1,7 @@
 {
   "name": "aave-governance-forge-template",
   "description": "An opionated template for creating aave proposal payloads.",
-  "author": " Omer Goldberg <omer@chaoslabs.xyz>",
+  "author": "Yonatan Hayun <johnhayun@chaoslabs.xyz>",
   "version": "0.0.1",
   "license": "AGPL-3.0-only",
   "files": [
@@ -27,13 +27,13 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal#readme.git"
   },
   "keywords": [],
   "bugs": {
-    "url": ""
+    "url": "https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal#readme/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal#readme",
   "devDependencies": {
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",

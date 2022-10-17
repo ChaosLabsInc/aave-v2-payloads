@@ -77,15 +77,20 @@ contract ProposalPayloadTest is Test {
         // Checking if Chaos can withdraw from streams
         vm.startPrank(CHAOS_RECIPIENT);
         // Checking Chaos withdrawal every 30 days over 12 month period
-        uint256 withdrawlTimes = 0;
+        uint256 withdrawals = 0;
         for (uint256 i = 0; i < ENGAGEMENT_RANGE; i++) {
             vm.warp(block.timestamp + 30 days);
             if (i < NO_PAYMENT_RANGE) {
-                //Withdrawl with 0 amount throws exception:
+                // First 6 months 0 payment
+                // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+                // Checking aUSDC stream amount
+                assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+                assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
+                // Withdrawl with 0 amount throws exception:
                 // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L282
                 continue;
             }
-            withdrawlTimes++;
+            withdrawals++;
             uint256 currentAusdcChaosBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
             uint256 currentAusdcChaosStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
                 nextMainnetReserveFactorStreamID,
@@ -112,7 +117,7 @@ contract ProposalPayloadTest is Test {
         }
 
         //check final numbers:
-        assertEq(withdrawlTimes, 6);
+        assertEq(withdrawals, 6);
         assertEq(AUSDC.balanceOf(CHAOS_RECIPIENT) >= initialCHAOSAusdcBalance + AUSDC_STREAM_AMOUNT, true);
         vm.stopPrank();
     }

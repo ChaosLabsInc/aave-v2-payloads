@@ -19,7 +19,7 @@ contract ProposalPayload {
     // Reserve that holds AAVE tokens
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     // Chaos Recipient address
-    address public constant CHAOS_RECIPIENT = 0x866505a747D958b21E56D516DA61f13949949C2d; // TODO: Replace with actual recipient
+    address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
     address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;
 
     // ~500,000 aUSDC = $0.5 million
@@ -29,8 +29,8 @@ contract ProposalPayload {
     uint256 public constant AUSDC_STREAM_AMOUNT = 500000e6 + 12352000;
 
     // 12 months of 30 days ~ 1 year
-    uint256 public constant STREAMS_END =  360 days;  // 6 months duration from start
-    uint256 public constant STREAMS_START = 180 days;  // in 6 months
+    uint256 public constant STREAMS_END = 360 days; // 6 months duration from start
+    uint256 public constant STREAMS_START = 180 days; // in 6 months
 
     /*****************
      *   FUNCTIONS   *

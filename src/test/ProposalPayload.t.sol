@@ -129,7 +129,6 @@ contract ProposalPayloadTest is Test {
                 // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
                 // Checking aUSDC stream amount
                 assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
-                assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
                 // Withdrawl with 0 amount throws exception:
                 // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L282
                 continue;

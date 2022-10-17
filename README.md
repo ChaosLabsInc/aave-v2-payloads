@@ -4,7 +4,7 @@ Payload and tests for the Chaos <> AAVE Proposal
 
 ## Specification
 
-This repository contains the [Payload]() and [Tests]() for the [Chaos <> Aave Proposal]()
+This repository contains the [Payload](https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal/blob/main/src/ProposalPayload.sol) and [Tests](https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal/blob/main/src/test/ProposalPayload.t.sol) for the [Chaos <> Aave Proposal](https://governance.aave.com/t/updated-proposal-chaos-labs-risk-simulation-platform/10025)
 
 The Proposal Payload does the following:
 
@@ -17,7 +17,7 @@ It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You 
 In order to install, run the following commands:
 
 ```sh
-$ git clone <URL>
+$ git clone https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal
 $ cd aave-chaos-proposal/
 $ npm install
 $ forge install

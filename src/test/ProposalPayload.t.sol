@@ -48,7 +48,6 @@ contract ProposalPayloadTest is Test {
 
     // First 6 months, stream transfers 0 funds.
     function testNoPaymentInitial6Months() public {
-        uint256 initialChaosAUSDCBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
         // Capturing next Stream IDs before proposal is executed
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
 
@@ -84,12 +83,10 @@ contract ProposalPayloadTest is Test {
             // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
             // Checking aUSDC stream amount
             assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
-            assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
             // Withdrawl with 0 amount throws exception:
             // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L282
         }
         assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), 0, 1);
-        assertApproxEqAbs(AUSDC.balanceOf(CHAOS_RECIPIENT), initialChaosAUSDCBalance, 1);
         vm.stopPrank();
     }
 

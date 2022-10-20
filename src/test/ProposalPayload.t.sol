@@ -19,10 +19,10 @@ contract ProposalPayloadTest is Test {
 
     IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
 
-    address public immutable AAVE_MAINNET_RESERVE_FACTOR = AaveV2Ethereum.COLLECTOR;
+    address public immutable AAVE_COLLECTOR = AaveV2Ethereum.COLLECTOR;
     address public constant CHAOS_RECIPIENT = 0x866505a747D958b21E56D516DA61f13949949C2d; // TODO: Replace with actual recipient
 
-    IStreamable public immutable STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
+    IStreamable public immutable STREAMABLE_AAVE_COLLECTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
 
     uint256 public constant AUSDC_STREAM_AMOUNT = 500000e6 + 12352000;
     // 12 months of 30 days
@@ -49,7 +49,7 @@ contract ProposalPayloadTest is Test {
     // First 6 months, stream transfers 0 funds.
     function testNoPaymentInitial6Months() public {
         // Capturing next Stream IDs before proposal is executed
-        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
+        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
 
         // Pass vote and execute proposal
         GovHelpers.passVoteAndExecute(vm, proposalId);
@@ -65,9 +65,9 @@ contract ProposalPayloadTest is Test {
             uint256 stopTimeAusdc,
             uint256 remainingBalanceAusdc,
             uint256 _ratePerSecondAusdc
-        ) = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID);
+        ) = STREAMABLE_AAVE_COLLECTOR.getStream(nextMainnetReserveFactorStreamID);
 
-        assertEq(senderAusdc, AAVE_MAINNET_RESERVE_FACTOR);
+        assertEq(senderAusdc, AAVE_COLLECTOR);
         assertEq(recipientAusdc, CHAOS_RECIPIENT);
         assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
         assertEq(tokenAddressAusdc, address(AUSDC));
@@ -94,7 +94,7 @@ contract ProposalPayloadTest is Test {
     function testExecute() public {
         uint256 initialChaosAUSDCBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
         // Capturing next Stream IDs before proposal is executed
-        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
+        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
 
         // Pass vote and execute proposal
         GovHelpers.passVoteAndExecute(vm, proposalId);
@@ -110,9 +110,9 @@ contract ProposalPayloadTest is Test {
             uint256 stopTimeAusdc,
             uint256 remainingBalanceAusdc,
             uint256 ratePerSecondAusdc
-        ) = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID);
+        ) = STREAMABLE_AAVE_COLLECTOR.getStream(nextMainnetReserveFactorStreamID);
 
-        assertEq(senderAusdc, AAVE_MAINNET_RESERVE_FACTOR);
+        assertEq(senderAusdc, AAVE_COLLECTOR);
         assertEq(recipientAusdc, CHAOS_RECIPIENT);
         assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
         assertEq(tokenAddressAusdc, address(AUSDC));
@@ -134,12 +134,12 @@ contract ProposalPayloadTest is Test {
                 continue;
             }
             uint256 currentAusdcChaosBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
-            uint256 currentAusdcChaosStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
+            uint256 currentAusdcChaosStreamBalance = STREAMABLE_AAVE_COLLECTOR.balanceOf(
                 nextMainnetReserveFactorStreamID,
                 CHAOS_RECIPIENT
             );
 
-            STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.withdrawFromStream(
+            STREAMABLE_AAVE_COLLECTOR.withdrawFromStream(
                 nextMainnetReserveFactorStreamID,
                 currentAusdcChaosStreamBalance
             );

@@ -17,7 +17,7 @@ contract ProposalPayload {
      ********************************/
 
     // Chaos Recipient address
-    address public constant CHAOS_RECIPIENT = 0x866505a747D958b21E56D516DA61f13949949C2d;
+    address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
     address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;
 
     // ~500,000 aUSDC = $0.5 million

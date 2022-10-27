@@ -20,7 +20,7 @@ contract ProposalPayloadTest is Test {
     IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
 
     address public immutable AAVE_COLLECTOR = AaveV2Ethereum.COLLECTOR;
-    address public constant CHAOS_RECIPIENT = 0x866505a747D958b21E56D516DA61f13949949C2d; // TODO: Replace with actual recipient
+    address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
 
     IStreamable public immutable STREAMABLE_AAVE_COLLECTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
 

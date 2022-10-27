@@ -38,7 +38,7 @@ contract DeployProposal is Script {
         vm.startBroadcast();
         DeployMainnetProposal._deployMainnetProposal(
             address(0), // TODO: replace with mainnet payload address
-            bytes32(0) // TODO: replace with actual ipfshash
+            bytes32(0xdad8e5e19ea5f550a9c991bba405f06fafb9c61096298053c21df9bf4266d4a3) // TODO: replace with actual ipfshash
         );
         vm.stopBroadcast();
     }

@@ -42,7 +42,7 @@ contract ProposalPayloadTest is Test {
         vm.prank(AAVE_WHALE);
         proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(proposalPayload),
-            0x344d3181f08b3186228b93bac0005a3a961238164b8b06cbb5f0428a9180b8a7 // TODO: Replace with actual IPFS Hash
+            0xdad8e5e19ea5f550a9c991bba405f06fafb9c61096298053c21df9bf4266d4a3
         );
     }
 

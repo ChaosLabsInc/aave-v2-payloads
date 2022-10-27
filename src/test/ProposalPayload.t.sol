@@ -42,7 +42,7 @@ contract ProposalPayloadTest is Test {
         vm.prank(AAVE_WHALE);
         proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(proposalPayload),
-            0xdad8e5e19ea5f550a9c991bba405f06fafb9c61096298053c21df9bf4266d4a3
+            0xadc1a6f23527a44e6dbc0ec73653824ec065b62fd23a3975ab47d79548fc314b
         );
     }
 

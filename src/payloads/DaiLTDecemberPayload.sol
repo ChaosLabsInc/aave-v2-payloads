@@ -12,11 +12,14 @@ import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
  */
 contract ProposalPayload {
     address public constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-    uint256 public constant LTV = 0; // 77 -> 75
-    uint256 public constant LIQUIDATION_THRESHOLD = 0; // 90 -> 87
-    uint256 public constant LIQUIDATION_BONUS = 0; //unchanged
+    uint256 public constant LTV = 7500; // 77 -> 75
+    uint256 public constant LIQUIDATION_THRESHOLD = 8700; // 90 -> 87
+    uint256 public constant LIQUIDATION_BONUS = 10400; //unchanged - 10400
 
     function execute() external {
+        // lendingPoolConfigurator.enableBorrowingOnReserve(ENS, false);
+        // AaveV2Ethereum.POOL_CONFIGURATOR.setReserveFactor(DAI, LTV);
+
         AaveV2Ethereum.POOL_CONFIGURATOR.configureReserveAsCollateral(
             DAI,
             LTV,

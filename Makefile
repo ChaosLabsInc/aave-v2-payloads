@@ -8,8 +8,8 @@ install  :; forge install
 
 # Build & test
 build    :; forge clean && forge build --via-ir
-test     :; forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} $(call compute_test_verbosity,${V}) # Usage: make test [optional](V=<{1,2,3,4,5}>)
-match    :; forge clean && forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} $(call compute_test_verbosity,${V}) # Usage: make match MATCH=<TEST_FUNCTION_NAME> [optional](V=<{1,2,3,4,5}>)
+test     :; forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} -vv
+match    :; forge clean && forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} -vvv
 report   :; forge clean && forge test --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
 
 # Deploy and Verify Payload
@@ -23,14 +23,3 @@ deploy-proposal :; forge script script/DeployMainnetProposal.s.sol:DeployProposa
 clean    :; forge clean
 lint     :; npx prettier --write src/**/*.sol
 
-# Defaults to -v if no V=<{1,2,3,4,5} specified
-define compute_test_verbosity
-$(strip \
-$(if $(filter 1,$(1)),-v,\
-$(if $(filter 2,$(1)),-vv,\
-$(if $(filter 3,$(1)),-vvv,\
-$(if $(filter 4,$(1)),-vvvv,\
-$(if $(filter 5,$(1)),-vvvvv,\
--v
-))))))
-endef

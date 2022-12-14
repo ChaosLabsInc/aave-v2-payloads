@@ -12,7 +12,7 @@ import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
-contract ProposalPayloadTest is Test {
+contract ProposalPaymentPayloadTest is Test {
     address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
 
     uint256 public proposalId;

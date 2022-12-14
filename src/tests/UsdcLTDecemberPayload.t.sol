@@ -8,16 +8,16 @@ import "@forge-std/Test.sol";
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveAddressBookV2} from "@aave-address-book/AaveAddressBook.sol";
-import {ProposalPayload} from "../payloads/DaiLTDecemberPayload.sol";
+import {ProposalPayload} from "../payloads/UsdcLTDecemberPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {AaveV2Helpers, ReserveConfig, ReserveTokens, InterestStrategyValues} from "./utils/AaveV2Helpers.sol";
 
-contract ProposalDAILTPayloadTest is Test {
+contract ProposalUsdcLTPayloadTest is Test {
     address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
-    string public constant DAISymbol = "DAI";
+    string public constant USDCSymbol = "USDC";
 
-    uint256 public constant LTV = 7500; // 77 -> 75
-    uint256 public constant LIQUIDATION_THRESHOLD = 8700; // 90 -> 87
+    uint256 public constant LTV = 8000; /// 87 -> 80
+    uint256 public constant LIQUIDATION_THRESHOLD = 8750; // 89 -> 87.5
 
     uint256 public proposalId;
     ProposalPayload public proposalPayload;
@@ -43,7 +43,7 @@ contract ProposalDAILTPayloadTest is Test {
             false,
             AaveAddressBookV2.AaveV2Ethereum
         );
-        ReserveConfig memory config = AaveV2Helpers._findReserveConfig(allConfigsBefore, DAISymbol, false);
+        ReserveConfig memory config = AaveV2Helpers._findReserveConfig(allConfigsBefore, USDCSymbol, false);
 
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
@@ -54,7 +54,7 @@ contract ProposalDAILTPayloadTest is Test {
 
         AaveV2Helpers._validateCountOfListings(0, allConfigsBefore, allConfigsAfter);
 
-        // ReserveConfig memory configAfter = AaveV2Helpers._findReserveConfig(allConfigsAfter, DAISymbol, false);
+        // ReserveConfig memory configAfter = AaveV2Helpers._findReserveConfig(allConfigsAfter, USDCSymbol, false);
         // console.log("ltv before", config.ltv);
         // console.log("lq before", config.liquidationThreshold);
         // console.log("lt before", config.liquidationBonus);

@@ -10,4 +10,16 @@ test = 'test'
 out = 'out'
 
 [rpc_endpoints]
-mainnet = "${RPC_MAINNET_URL}"
+mainnet = "${RPC_ETHEREUM}"
+optimism = "${RPC_OPTIMISM}"
+avalanche = "${RPC_AVALANCHE}"
+polygon = "${RPC_POLYGON}"
+arbitrum = "${RPC_ARBITRUM}"
+
+
+[etherscan]
+mainnet={key="${ETHERSCAN_API_KEY}",chainId=1}
+optimism={key="${OPTISCAN_API_KEY}",chainId=10}
+avalanche={key="${AVALACNHE_API_KEY}",chainId=43114}
+polygon={key="${POLYGON_API_KEY}",chainId=137}
+arbitrum={key="${ARBICAN_API_KEY}",chainId=42161}

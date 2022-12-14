@@ -7,7 +7,7 @@ import "@forge-std/Test.sol";
 // contract dependencies
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
-import {ProposalPayload} from "../ProposalPayload.sol";
+import {ProposalPayload} from "../payloads/PaymentProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
@@ -33,7 +33,7 @@ contract ProposalPayloadTest is Test {
 
     function setUp() public {
         // To fork at a specific block: vm.createSelectFork(vm.rpcUrl("mainnet", BLOCK_NUMBER));
-        vm.createSelectFork(vm.rpcUrl("mainnet"));
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 16181693);
 
         // Deploy Payload
         ProposalPayload proposalPayload = new ProposalPayload();

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
+import {IAaveEcosystemReserveController} from "../external/aave/IAaveEcosystemReserveController.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 
 /**

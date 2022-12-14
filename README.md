@@ -1,14 +1,6 @@
-# Chaso <> AAVE Proposal
+# Chaso <> AAVE Proposals & payloads
 
-Payload and tests for the Chaos <> AAVE Proposal
-
-## Specification
-
-This repository contains the [Payload](https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal/blob/main/src/ProposalPayload.sol) and [Tests](https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal/blob/main/src/test/ProposalPayload.t.sol) for the [Chaos <> Aave Proposal](https://governance.aave.com/t/updated-proposal-chaos-labs-risk-simulation-platform/10025)
-
-The Proposal Payload does the following:
-
-1. Creates a 6-month stream of 500,000 aUSDC ($0.5 Million) to the Chaos-controlled address.
+Payload and tests for the Chaos <> AAVE Proposals
 
 ## Installation
 

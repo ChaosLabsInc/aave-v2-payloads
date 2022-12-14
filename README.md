@@ -9,8 +9,6 @@ It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You 
 In order to install, run the following commands:
 
 ```sh
-$ git clone https://github.com/ChaosLabsInc/aave-chaos-v3-risk-proposal
-$ cd aave-chaos-proposal/
 $ npm install
 $ forge install
 ```

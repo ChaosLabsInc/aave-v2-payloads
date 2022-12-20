@@ -19,6 +19,11 @@ verify-payload :; forge script script/DeployProposalPayload.s.sol:DeployProposal
 # Deploy Proposal
 deploy-proposal :; forge script script/DeployMainnetProposal.s.sol:DeployProposal --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
 
+#specific:
+deploy-stable-lt-proposal :; forge script script/specific/DeployDaiAndUsdcLTsProposal.s.sol:DeployProposal --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
+deploy-tail-lt-proposal :; forge script script/specific/DeployLongTailLTProposal.s.sol:DeployProposal --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
+
+
 # Clean & lint
 clean    :; forge clean
 lint     :; npx prettier --write src/**/*.sol

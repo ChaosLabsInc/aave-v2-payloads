@@ -18,6 +18,9 @@ verify-payload :; forge script script/DeployProposalPayload.s.sol:DeployProposal
 
 # Deploy Proposal
 deploy-proposal :; forge script script/DeployMainnetProposal.s.sol:DeployProposal --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
+emit-proposal :; forge script script/specific/DeployLongTailLTProposal.s.sol:EmitOp --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
+emit-multi-proposal :; forge script script/DeployMultiMainnetProposal.s.sol:EmitOp --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv
+
 
 #specific:
 deploy-stable-lt-proposal :; forge script script/specific/DeployDaiAndUsdcLTsProposal.s.sol:DeployProposal --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} -vvvv

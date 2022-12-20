@@ -49,7 +49,7 @@ contract DeployProposal is Script {
         payloads[1] = 0x60bCd1CaF97c3fCbC35Bf92A8852728420C34FB5; //DAI
         DeployMainnetProposal._deployMainnetMultiProposals(
             payloads,
-            bytes32(0x92596c371b9f45caf0389154f37aa9ab679acdf2763c4ece366615345ba14cbf)
+            0x92596c371b9f45caf0389154f37aa9ab679acdf2763c4ece366615345ba14cbf
         );
 
         vm.stopBroadcast();

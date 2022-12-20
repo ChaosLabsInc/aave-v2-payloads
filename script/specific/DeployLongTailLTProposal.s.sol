@@ -38,7 +38,7 @@ contract DeployProposal is Script {
         vm.startBroadcast();
         DeployMainnetProposal._deployMainnetProposal(
             address(0x33d7385B2BF82b2183aFc66dC84EA5f3F2D240D5), // Long Tail LT
-            bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45) // TODO: replace with actual ipfshash
+            bytes32(0x31cc3826fed671c95f9522cdac3cb6b6b9bf75ba311c28e84327729586254eed)
         );
         vm.stopBroadcast();
     }

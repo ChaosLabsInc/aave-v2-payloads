@@ -27,7 +27,7 @@ contract ProposalPayload {
 
     // ~175,000 aUSDC = $175,000
     // Small additional amount to handle remainder condition during streaming
-    // duration 150 days = 12960000 [seconds] --> (175000e6 + [12960000 - 3200000]) % 12960000 = 0
+    // duration 150 days = 12960000 [seconds] --> (175000e6 + [12960000 - 1120000]) % 12960000 = 0
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
     uint256 public constant AUSDC_STREAM_AMOUNT = 175000e6 + 11840000;
 

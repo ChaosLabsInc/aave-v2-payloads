@@ -31,9 +31,8 @@ contract ProposalPayload {
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
     uint256 public constant AUSDC_STREAM_AMOUNT = 175000e6 + 11840000;
 
-    // TODO: fix the amount of tokens according to aave price
+    // Aave token 30 days TWAP price 22/11-21/12 is $60.378
     // ~1242 aAAVE = $75,000
-    // TODO: what is the remainder here?
     // Small additional amount to handle remainder condition during streaming
     // duration 150 days = 12960000 [seconds] --> (1242e18 + [12960000 - 8640000]) % 12960000 = 0
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233

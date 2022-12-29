@@ -29,7 +29,7 @@ contract ProposalPaymentPayloadTest is Test {
 
     uint256 public constant AUSDC_STREAM_AMOUNT = 175000e6 + 11840000;
     //TODO: whats the remainder here?
-    uint256 public constant AAVE_STREAM_AMOUNT = 1358e18 + 640000;
+    uint256 public constant AAVE_STREAM_AMOUNT = 1242e18 + 8640000;
 
     // 5 months of 30 days
     uint256 public constant STREAMS_DURATION = 150 days; // 5*30 days duration

@@ -13,8 +13,6 @@ import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
 contract ProposalPaymentPayloadTest is Test {
-    address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
-
     uint256 public proposalId;
 
     IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
@@ -44,7 +42,7 @@ contract ProposalPaymentPayloadTest is Test {
         ProposalPayload proposalPayload = new ProposalPayload();
 
         // Create Proposal
-        vm.prank(AAVE_WHALE);
+        vm.prank(GovHelpers.AAVE_WHALE);
         proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(proposalPayload),
             bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45) // TODO: replace with actual ipfshash

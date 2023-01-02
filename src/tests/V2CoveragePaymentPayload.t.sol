@@ -27,9 +27,9 @@ contract ProposalPaymentPayloadTest is Test {
     IStreamable public immutable STREAMABLE_AAVE_COLLECTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
     IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
 
-    uint256 public constant AUSDC_STREAM_AMOUNT = 175000e6 + 11840000;
+    uint256 public constant AUSDC_STREAM_AMOUNT = 175000e6;
     //TODO: whats the remainder here?
-    uint256 public constant AAVE_STREAM_AMOUNT = 1242e18 + 8640000;
+    uint256 public constant AAVE_STREAM_AMOUNT = 1242e18;
 
     // 5 months of 30 days
     uint256 public constant STREAMS_DURATION = 150 days; // 5*30 days duration
@@ -51,10 +51,10 @@ contract ProposalPaymentPayloadTest is Test {
         );
     }
 
-    // // Full Payment Term Test. Stream 5 months.
+    // Full Payment Term Test. Stream 5 months.
     function testExecuteUsdc() public {
+        uint256 actualAmountUSDC = (AUSDC_STREAM_AMOUNT / STREAMS_DURATION) * STREAMS_DURATION; // rounding
         uint256 initialChaosAUSDCBalance = AUSDC.balanceOf(CHAOS_RECIPIENT);
-        uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_COLLECTOR);
 
         // Capturing next Stream IDs before proposal is executed
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
@@ -77,10 +77,10 @@ contract ProposalPaymentPayloadTest is Test {
 
         assertEq(senderAusdc, AAVE_COLLECTOR);
         assertEq(recipientAusdc, CHAOS_RECIPIENT);
-        assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
+        assertEq(depositAusdc, actualAmountUSDC);
         assertEq(tokenAddressAusdc, address(AUSDC));
         assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_DURATION);
-        assertEq(remainingBalanceAusdc, AUSDC_STREAM_AMOUNT);
+        assertEq(remainingBalanceAusdc, actualAmountUSDC);
 
         // Checking if Chaos can withdraw from streams
         vm.startPrank(CHAOS_RECIPIENT);
@@ -113,12 +113,13 @@ contract ProposalPaymentPayloadTest is Test {
         }
 
         //check final numbers:
-        assertEq(AUSDC.balanceOf(CHAOS_RECIPIENT) >= initialChaosAUSDCBalance + AUSDC_STREAM_AMOUNT, true);
+        assertEq(AUSDC.balanceOf(CHAOS_RECIPIENT) >= initialChaosAUSDCBalance + actualAmountUSDC, true);
         vm.stopPrank();
     }
 
     // Full Payment Term Test. Stream 5 months.
     function testExecuteAave() public {
+        uint256 actualAmountAave = (AAVE_STREAM_AMOUNT / STREAMS_DURATION) * STREAMS_DURATION; // rounding
         uint256 initialChaosAAVEBalance = AAVE.balanceOf(CHAOS_RECIPIENT);
         uint256 initialEcosystemReserveAaveBalance = AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE);
 
@@ -142,10 +143,10 @@ contract ProposalPaymentPayloadTest is Test {
 
         assertEq(senderAave, AAVE_ECOSYSTEM_RESERVE);
         assertEq(recipientAave, CHAOS_RECIPIENT);
-        assertEq(depositAave, AAVE_STREAM_AMOUNT);
+        assertEq(depositAave, actualAmountAave);
         assertEq(tokenAddressAave, address(AAVE));
         assertEq(stopTimeAave - startTimeAave, STREAMS_DURATION);
-        assertEq(remainingBalanceAave, AAVE_STREAM_AMOUNT);
+        assertEq(remainingBalanceAave, actualAmountAave);
 
         // Checking if Chaos can withdraw from streams
         vm.startPrank(CHAOS_RECIPIENT);
@@ -169,7 +170,7 @@ contract ProposalPaymentPayloadTest is Test {
         }
 
         //check final numbers:
-        assertEq(AAVE.balanceOf(CHAOS_RECIPIENT) >= initialChaosAAVEBalance + AAVE_STREAM_AMOUNT, true);
+        assertEq(AAVE.balanceOf(CHAOS_RECIPIENT) >= initialChaosAAVEBalance + actualAmountAave, true);
         vm.stopPrank();
     }
 }

@@ -48,7 +48,7 @@ contract ProposalPayload {
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
         // Creation of the streams
-        // Stream of $175,000 million in aUSDC over 5 months
+        // Stream of $175,000 in aUSDC over 5 months
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).createStream(
             AaveV2Ethereum.COLLECTOR,
             CHAOS_RECIPIENT,

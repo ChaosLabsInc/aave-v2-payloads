@@ -7,9 +7,9 @@ update   :; forge update
 install  :; forge install
 
 # Build & test
-build    :; forge clean && forge build --via-ir
-test     :; forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} -vv
-match    :; forge clean && forge test --via-ir --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} -vvv
+build    :; forge clean && forge build
+test     :; forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -vv
+match    :; forge clean && forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} -vvv
 report   :; forge clean && forge test --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
 
 # Deploy and Verify Payload
@@ -31,3 +31,7 @@ deploy-tail-lt-proposal :; forge script script/specific/DeployLongTailLTProposal
 clean    :; forge clean
 lint     :; npx prettier --write src/**/*.sol
 
+deploy2-payload :; forge script  script/specific/DeployV2CoverageProposalPayload.s.sol:DeployProposalPayload --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} --verify --etherscan-api-key ${AVALACNHE_API_KEY} -vvvv
+
+# verify contract example:
+verify-contract :; forge verify-contract 0x5B669Dc5A7d9dF4ED06F58a9e79e4641f3C0b846 -csrc/payloads/V2CoveragePaymentPayload.sol:ProposalPayload #--etherscan-api-key ${AVALACNHE_API_KEY}

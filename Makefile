@@ -34,4 +34,4 @@ lint     :; npx prettier --write src/**/*.sol
 deploy2-payload :; forge script  script/specific/DeployV2CoverageProposalPayload.s.sol:DeployProposalPayload --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} --verify --etherscan-api-key ${AVALACNHE_API_KEY} -vvvv
 
 # verify contract example:
-verify-contract :; forge verify-contract 0x5B669Dc5A7d9dF4ED06F58a9e79e4641f3C0b846 -csrc/payloads/V2CoveragePaymentPayload.sol:ProposalPayload #--etherscan-api-key ${AVALACNHE_API_KEY}
+verify-contract :; forge verify-contract 0x8922235734ec69e956977e2ea9774de8f614053a src/payloads/V2CoveragePaymentPayload.sol:ProposalPayload #--etherscan-api-key ${AVALACNHE_API_KEY}

@@ -9,7 +9,6 @@ contract DeployProposalPayload is Script {
     function run() external {
         vm.startBroadcast();
         ProposalPayload proposalPayload = new ProposalPayload();
-        console.log("Proposal Payload address", address(proposalPayload));
         vm.stopBroadcast();
     }
 }

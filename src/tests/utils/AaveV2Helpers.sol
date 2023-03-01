@@ -211,7 +211,6 @@ library AaveV2Helpers {
         view
         returns (ReserveConfig[] memory)
     {
-        // AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(AaveAddressBookV2.AaveV2Ethereum);
         LocalVars memory vars;
         vars.reserves = market.AAVE_PROTOCOL_DATA_PROVIDER.getAllReservesTokens();
         vars.configs = new ReserveConfig[](vars.reserves.length);

@@ -8,7 +8,7 @@ import {ProposalPayload} from "../../src/payloads/MKRPayload-Feb26.sol";
 contract DeployProposalPayload is Script {
     function run() external {
         vm.startBroadcast();
-        ProposalPayload proposalPayload = new ProposalPayload();
+        new ProposalPayload();
         vm.stopBroadcast();
     }
 }

@@ -7,10 +7,9 @@ import "@forge-std/Test.sol";
 // contract dependencies
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
-import {AaveAddressBookV2} from "@aave-address-book/AaveAddressBook.sol";
 import {ProposalPayload} from "../payloads/LTTailDecemberPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
-import {AaveV2Helpers, ReserveConfig, ReserveTokens, InterestStrategyValues} from "./utils/AaveV2Helpers.sol";
+import {AaveV2Helpers, ReserveConfig, ReserveTokens, InterestStrategyValues, Market} from "./utils/AaveV2Helpers.sol";
 
 contract ProposalTailAssetsLTPayloadTest is Test {
     address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
@@ -51,43 +50,50 @@ contract ProposalTailAssetsLTPayloadTest is Test {
 
     function testDAILTProposal() public {
         require(proposalId != 0, "proposal deployed");
-        ReserveConfig[] memory allConfigsBefore = AaveV2Helpers._getReservesConfigs(
+        Market memory market = Market(
+            AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
+            AaveV2Ethereum.POOL,
+            AaveV2Ethereum.POOL_CONFIGURATOR,
+            AaveV2Ethereum.ORACLE,
+            AaveV2Ethereum.AAVE_PROTOCOL_DATA_PROVIDER
+                );
+        ReserveConfig[] memory allConfigsBefore = AaveV2Helpers.getReservesConfigs(
             false,
-            AaveAddressBookV2.AaveV2Ethereum
+            market
         );
 
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
-        ReserveConfig[] memory allConfigsAfter = AaveV2Helpers._getReservesConfigs(
+        ReserveConfig[] memory allConfigsAfter = AaveV2Helpers.getReservesConfigs(
             false,
-            AaveAddressBookV2.AaveV2Ethereum
+            market
         );
 
         AaveV2Helpers._validateCountOfListings(0, allConfigsBefore, allConfigsAfter);
 
         //ENS
-        ReserveConfig memory ENSconfig = AaveV2Helpers._findReserveConfig(allConfigsBefore, ENS, false);
+        ReserveConfig memory ENSconfig = AaveV2Helpers.findReserveConfig(allConfigsBefore, ENS, false);
         ENSconfig.ltv = ENS_LTV;
         ENSconfig.liquidationThreshold = ENS_LIQUIDATION_THRESHOLD;
 
         AaveV2Helpers._validateReserveConfig(ENSconfig, allConfigsAfter);
 
         //MKR
-        ReserveConfig memory MKRconfig = AaveV2Helpers._findReserveConfig(allConfigsBefore, MKR, false);
+        ReserveConfig memory MKRconfig = AaveV2Helpers.findReserveConfig(allConfigsBefore, MKR, false);
         MKRconfig.ltv = MKR_LTV;
         MKRconfig.liquidationThreshold = MKR_LIQUIDATION_THRESHOLD;
 
         AaveV2Helpers._validateReserveConfig(MKRconfig, allConfigsAfter);
 
         //SNX
-        ReserveConfig memory SNXconfig = AaveV2Helpers._findReserveConfig(allConfigsBefore, SNX, false);
+        ReserveConfig memory SNXconfig = AaveV2Helpers.findReserveConfig(allConfigsBefore, SNX, false);
         SNXconfig.ltv = SNX_LTV;
         SNXconfig.liquidationThreshold = SNX_LIQUIDATION_THRESHOLD;
 
         AaveV2Helpers._validateReserveConfig(SNXconfig, allConfigsAfter);
 
         //CRV
-        ReserveConfig memory CRVconfig = AaveV2Helpers._findReserveConfig(allConfigsBefore, CRV, false);
+        ReserveConfig memory CRVconfig = AaveV2Helpers.findReserveConfig(allConfigsBefore, CRV, false);
         CRVconfig.ltv = CRV_LTV;
         CRVconfig.liquidationThreshold = CRV_LIQUIDATION_THRESHOLD;
 

@@ -3,9 +3,8 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Vm.sol";
 import "forge-std/console.sol";
-import {AaveAddressBookV2} from "aave-address-book/AaveAddressBook.sol";
-import {TokenData} from "aave-address-book/AaveV2.sol";
-import {IERC20} from "solidity-utils/contracts/oz-common/interfaces/IERC20.sol";
+import {TokenData, ILendingPoolAddressesProvider, ILendingPool, ILendingPoolConfigurator, IAaveOracle, IAaveProtocolDataProvider} from "aave-address-book/AaveV2.sol";
+import {IERC20} from "solidity-utils/src/contracts/oz-common/interfaces/IERC20.sol";
 
 struct ReserveTokens {
     address aToken;
@@ -95,15 +94,18 @@ struct InterestStrategyValues {
     uint256 variableRateSlope2;
 }
 
+struct Market {
+    ILendingPoolAddressesProvider POOL_ADDRESSES_PROVIDER;
+    ILendingPool POOL;
+    ILendingPoolConfigurator POOL_CONFIGURATOR;
+    IAaveOracle ORACLE;
+    IAaveProtocolDataProvider AAVE_PROTOCOL_DATA_PROVIDER;
+}
+
 interface IAddressesProvider {
     function getPriceOracle() external returns (address);
 }
 
-interface IAaveOracle {
-    function getSourceOfAsset(address asset) external returns (address);
-
-    function getAssetPrice(address asset) external returns (address);
-}
 
 interface IReserveInterestRateStrategy {
     function getMaxVariableBorrowRate() external view returns (uint256);
@@ -204,19 +206,18 @@ library AaveV2Helpers {
         ReserveConfig[] configs;
     }
 
-    function _getReservesConfigs(bool withLogs, string memory marketName)
+    function getReservesConfigs(bool withLogs, Market memory market)
         internal
         view
         returns (ReserveConfig[] memory)
     {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(AaveAddressBookV2.AaveV2Ethereum);
         LocalVars memory vars;
         vars.reserves = market.AAVE_PROTOCOL_DATA_PROVIDER.getAllReservesTokens();
         vars.configs = new ReserveConfig[](vars.reserves.length);
 
         for (uint256 i = 0; i < vars.reserves.length; i++) {
-            vars.configs[i] = _getStructReserveConfig(vars.reserves[i], marketName);
-            ReserveTokens memory reserveTokens = _getStructReserveTokens(vars.configs[i].underlying, marketName);
+            vars.configs[i] = _getStructReserveConfig(vars.reserves[i], market);
+            ReserveTokens memory reserveTokens = _getStructReserveTokens(vars.configs[i].underlying, market);
             vars.configs[i].aToken = reserveTokens.aToken;
             vars.configs[i].variableDebtToken = reserveTokens.variableDebtToken;
             vars.configs[i].stableDebtToken = reserveTokens.stableDebtToken;
@@ -229,13 +230,13 @@ library AaveV2Helpers {
     }
 
     /// @dev Ugly, but necessary to avoid Stack Too Deep
-    function _getStructReserveConfig(TokenData memory reserve, string memory marketName)
+    function _getStructReserveConfig(TokenData memory reserve, Market memory market)
         internal
         view
         returns (ReserveConfig memory)
     {
         ReserveConfig memory localConfig;
-        ConfigLite memory configData = _getConfigData(marketName, reserve.tokenAddress);
+        ConfigLite memory configData = _getConfigData(market, reserve.tokenAddress);
         localConfig.symbol = reserve.symbol;
         localConfig.underlying = reserve.tokenAddress;
         localConfig.decimals = configData.decimals;
@@ -254,8 +255,8 @@ library AaveV2Helpers {
     }
 
     /// @dev to fix stack too deep
-    function _getConfigData(string memory marketName, address tokenAddress) internal view returns (ConfigLite memory) {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
+    function _getConfigData(Market memory market, address tokenAddress) internal view returns (ConfigLite memory) {
+        
         (
             uint256 decimals,
             uint256 ltv,
@@ -286,12 +287,12 @@ library AaveV2Helpers {
     }
 
     /// @dev Ugly, but necessary to avoid Stack Too Deep
-    function _getStructReserveTokens(address underlyingAddress, string memory marketName)
+    function _getStructReserveTokens(address underlyingAddress, Market memory market)
         internal
         view
         returns (ReserveTokens memory)
     {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
+        
         ReserveTokens memory reserveTokens;
         (reserveTokens.aToken, reserveTokens.stableDebtToken, reserveTokens.variableDebtToken) = market
             .AAVE_PROTOCOL_DATA_PROVIDER
@@ -300,7 +301,7 @@ library AaveV2Helpers {
         return reserveTokens;
     }
 
-    function _findReserveConfig(
+    function findReserveConfig(
         ReserveConfig[] memory configs,
         string memory symbolOfUnderlying,
         bool withLogs
@@ -341,7 +342,7 @@ library AaveV2Helpers {
         internal
         view
     {
-        ReserveConfig memory config = _findReserveConfig(allConfigs, expectedConfig.symbol, false);
+        ReserveConfig memory config = findReserveConfig(allConfigs, expectedConfig.symbol, false);
         require(config.underlying == expectedConfig.underlying, "_validateEnsConfigsInAave() : INVALID_UNDERLYING");
         require(config.decimals == expectedConfig.decimals, "_validateEnsConfigsInAave: INVALID_DECIMALS");
         require(config.ltv == expectedConfig.ltv, "_validateEnsConfigsInAave: INVALID_LTV");
@@ -378,9 +379,9 @@ library AaveV2Helpers {
         address asset,
         address expectedStrategy,
         InterestStrategyValues memory expectedStrategyValues,
-        string memory marketName
+        Market memory market
     ) internal view {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
+        
         IReserveInterestRateStrategy strategy = IReserveInterestRateStrategy(
             market.POOL.getReserveData(asset).interestRateStrategyAddress
         );
@@ -501,9 +502,8 @@ library AaveV2Helpers {
         Vm vm,
         ReserveConfig memory config,
         ReserveTokens memory expectedImpls,
-        string memory marketName
+        Market memory market
     ) internal {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
         vm.startPrank(address(market.POOL_CONFIGURATOR));
         require(
             IInitializableAdminUpgradeabilityProxy(config.aToken).implementation() == expectedImpls.aToken,
@@ -530,9 +530,8 @@ library AaveV2Helpers {
         uint256 amount,
         bool approve,
         address aToken,
-        string memory marketName
+        Market memory market
     ) internal {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
         uint256 aTokenBefore = IERC20(aToken).balanceOf(onBehalfOf);
         vm.deal(depositor, 1 ether);
         vm.startPrank(depositor);
@@ -554,9 +553,8 @@ library AaveV2Helpers {
         uint256 amount,
         uint256 interestRateMode,
         address debtToken,
-        string memory marketName
+        Market memory market
     ) public {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
         uint256 debtBefore = IERC20(debtToken).balanceOf(onBehalfOf);
         vm.deal(borrower, 1 ether);
         vm.startPrank(borrower);
@@ -576,9 +574,8 @@ library AaveV2Helpers {
         uint256 interestRateMode,
         address debtToken,
         bool approve,
-        string memory marketName
+        Market memory market
     ) internal {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
         uint256 debtBefore = IERC20(debtToken).balanceOf(debtor);
         vm.deal(whoRepays, 1 ether);
         vm.startPrank(whoRepays);
@@ -600,9 +597,8 @@ library AaveV2Helpers {
         address asset,
         uint256 amount,
         address aToken,
-        string memory marketName
-    ) internal {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
+        Market memory market
+    ) internal { 
         uint256 aTokenBefore = IERC20(aToken).balanceOf(whoWithdraws);
         vm.deal(whoWithdraws, 1 ether);
         vm.startPrank(whoWithdraws);
@@ -620,9 +616,8 @@ library AaveV2Helpers {
     function _validateAssetSourceOnOracle(
         address asset,
         address expectedSource,
-        string memory marketName
+        Market memory market
     ) external view {
-        AaveAddressBookV2.Market memory market = AaveAddressBookV2.getMarket(marketName);
 
         require(
             market.ORACLE.getSourceOfAsset(asset) == expectedSource,

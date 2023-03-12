@@ -33,3 +33,11 @@ Duplicate `.env.example` and rename to `.env`:
 - `make deploy-proposal`- deploy proposal on mainnet
 
 To confirm the deploy was successful, re-run your test suite but use the newly created contract address.
+
+### Update dependencies
+
+1. `forge remove <LIB_PATH>`
+   if you get error "recursively without -r" run: `git rm -r --cached <LIB_PATH>`
+2. `forge install <LIB_URL> -no-commit`
+
+- `git submodule status` - check dependencies status

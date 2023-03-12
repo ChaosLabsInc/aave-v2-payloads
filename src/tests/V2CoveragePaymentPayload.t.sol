@@ -11,6 +11,7 @@ import {ProposalPayload} from "../payloads/V2CoveragePaymentPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
+import {AaveMisc} from '@aave-address-book/AaveMisc.sol';
 
 contract ProposalPaymentPayloadTest is Test {
     uint256 public proposalId;
@@ -42,7 +43,7 @@ contract ProposalPaymentPayloadTest is Test {
         ProposalPayload proposalPayload = new ProposalPayload();
 
         // Create Proposal
-        vm.prank(GovHelpers.AAVE_WHALE);
+        vm.prank(AaveMisc.ECOSYSTEM_RESERVE);
         proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(proposalPayload),
             bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45) // TODO: replace with actual ipfshash

@@ -5,7 +5,7 @@
 [profile.default]
 optimizer = true
 optimizer_runs = 200
-solc = "0.8.15"
+solc = "0.8.16"
 libs = ['lib']
 src = 'src'
 test = 'test'

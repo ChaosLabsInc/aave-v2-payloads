@@ -27,7 +27,6 @@ contract ProposalMKRPayloadTest is ProtocolV2TestBase, TestWithExecutor {
     }
 
     function testProposal() public {
-        // require(proposalId != 0, "proposal deployed");
         ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV2Ethereum.POOL);
         ReserveConfig memory config = _findReserveConfig(allConfigsBefore ,AaveV2EthereumAssets.MKR_UNDERLYING);
 

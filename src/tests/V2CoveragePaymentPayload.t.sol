@@ -1,25 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 // testing libraries
 import "@forge-std/Test.sol";
 
 // contract dependencies
-import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
-import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
+import {GovHelpers, TestWithExecutor} from "@aave-helpers/GovHelpers.sol";
+import {AaveV2Ethereum, AaveV2EthereumAssets} from "@aave-address-book/AaveV2Ethereum.sol";
 import {ProposalPayload} from "../payloads/V2CoveragePaymentPayload.sol";
-import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
+import {AaveMisc} from '@aave-address-book/AaveMisc.sol';
+import {ProtocolV2TestBase, ReserveConfig} from '@aave-helpers/ProtocolV2TestBase.sol';
+import {AaveGovernanceV2} from '@aave-address-book/AaveAddressBook.sol';
 
-contract ProposalPaymentPayloadTest is Test {
+
+contract ProposalPaymentPayloadV2Test is ProtocolV2TestBase, TestWithExecutor {
     uint256 public proposalId;
 
-    IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
-    IERC20 public constant AAVE = IERC20(0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9);
+    IERC20 public constant AUSDC = IERC20(AaveV2EthereumAssets.USDC_A_TOKEN);
+    IERC20 public constant AAVE = IERC20(AaveV2EthereumAssets.AAVE_UNDERLYING);
 
     address public immutable AAVE_COLLECTOR = AaveV2Ethereum.COLLECTOR;
-    address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
+    address public constant AAVE_ECOSYSTEM_RESERVE = AaveMisc.ECOSYSTEM_RESERVE;
     address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
 
     IStreamable public immutable STREAMABLE_AAVE_COLLECTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
@@ -37,16 +40,7 @@ contract ProposalPaymentPayloadTest is Test {
     function setUp() public {
         // To fork at a specific block: vm.createSelectFork(vm.rpcUrl("mainnet", BLOCK_NUMBER));
         vm.createSelectFork(vm.rpcUrl("mainnet"), 16283051);
-
-        // Deploy Payload
-        ProposalPayload proposalPayload = new ProposalPayload();
-
-        // Create Proposal
-        vm.prank(GovHelpers.AAVE_WHALE);
-        proposalId = DeployMainnetProposal._deployMainnetProposal(
-            address(proposalPayload),
-            bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45) // TODO: replace with actual ipfshash
-        );
+        _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR);
     }
 
     // Full Payment Term Test. Stream 5 months.
@@ -58,7 +52,7 @@ contract ProposalPaymentPayloadTest is Test {
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
 
         // Pass vote and execute proposal
-        GovHelpers.passVoteAndExecute(vm, proposalId);
+        _executePayload(address(new ProposalPayload()));
 
         // Checking if the streams have been created properly
         // aUSDC stream
@@ -119,13 +113,12 @@ contract ProposalPaymentPayloadTest is Test {
     function testExecuteAave() public {
         uint256 actualAmountAave = (AAVE_STREAM_AMOUNT / STREAMS_DURATION) * STREAMS_DURATION; // rounding
         uint256 initialChaosAAVEBalance = AAVE.balanceOf(CHAOS_RECIPIENT);
-        uint256 initialEcosystemReserveAaveBalance = AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE);
 
         // Capturing next Stream IDs before proposal is executed
         uint256 nextEcosystemReserveStreamID = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getNextStreamId();
 
         // Pass vote and execute proposal
-        GovHelpers.passVoteAndExecute(vm, proposalId);
+        _executePayload(address(new ProposalPayload()));
 
         // AAVE stream
         (

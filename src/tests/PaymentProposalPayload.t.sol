@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 // testing libraries
 import "@forge-std/Test.sol";
 
 // contract dependencies
-import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
-import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {ProposalPayload} from "../payloads/PaymentProposalPayload.sol";
-import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
+import {GovHelpers, TestWithExecutor} from "@aave-helpers/GovHelpers.sol";
+import {AaveV2Ethereum, AaveV2EthereumAssets} from "@aave-address-book/AaveV2Ethereum.sol";
+import {ProtocolV2TestBase, ReserveConfig} from '@aave-helpers/ProtocolV2TestBase.sol';
+import {AaveMisc, AaveGovernanceV2} from '@aave-address-book/AaveAddressBook.sol';
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
-contract ProposalPaymentPayloadTest is Test {
-    address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
+contract ProposalPaymentPayloadTest is ProtocolV2TestBase, TestWithExecutor {
 
     uint256 public proposalId;
 
-    IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
+    IERC20 public constant AUSDC = IERC20(AaveV2EthereumAssets.USDC_A_TOKEN);
 
     address public immutable AAVE_COLLECTOR = AaveV2Ethereum.COLLECTOR;
     address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
@@ -34,16 +34,7 @@ contract ProposalPaymentPayloadTest is Test {
     function setUp() public {
         // To fork at a specific block: vm.createSelectFork(vm.rpcUrl("mainnet", BLOCK_NUMBER));
         vm.createSelectFork(vm.rpcUrl("mainnet"), 16181693);
-
-        // Deploy Payload
-        ProposalPayload proposalPayload = new ProposalPayload();
-
-        // Create Proposal
-        vm.prank(AAVE_WHALE);
-        proposalId = DeployMainnetProposal._deployMainnetProposal(
-            address(proposalPayload),
-            bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45) // TODO: replace with actual ipfshash
-        );
+        _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR);
     }
 
     // First 6 months, stream transfers 0 funds.
@@ -52,7 +43,7 @@ contract ProposalPaymentPayloadTest is Test {
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
 
         // Pass vote and execute proposal
-        GovHelpers.passVoteAndExecute(vm, proposalId);
+        _executePayload(address(new ProposalPayload()));
 
         // Checking if the streams have been created properly
         // aUSDC stream
@@ -97,7 +88,7 @@ contract ProposalPaymentPayloadTest is Test {
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_COLLECTOR.getNextStreamId();
 
         // Pass vote and execute proposal
-        GovHelpers.passVoteAndExecute(vm, proposalId);
+        _executePayload(address(new ProposalPayload()));
 
         // Checking if the streams have been created properly
         // aUSDC stream

@@ -5,15 +5,13 @@ pragma solidity ^0.8.0;
 import "@forge-std/Test.sol";
 
 // contract dependencies
-import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
-import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
+import {GovHelpers, TestWithExecutor} from "@aave-helpers/GovHelpers.sol";
+import {AaveV2Ethereum, AaveV2EthereumAssets} from "@aave-address-book/AaveV2Ethereum.sol";
 import {ProposalPayload} from "../payloads/DaiLTDecemberPayload.sol";
-import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
-import {AaveV2Helpers, ReserveConfig, ReserveTokens, InterestStrategyValues, Market} from "./utils/AaveV2Helpers.sol";
+import {ProtocolV2TestBase, ReserveConfig} from '@aave-helpers/ProtocolV2TestBase.sol';
+import {AaveGovernanceV2} from '@aave-address-book/AaveAddressBook.sol';
 
-contract ProposalDAILTPayloadTest is Test {
-    address public constant AAVE_WHALE = 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
-    string public constant DAISymbol = "DAI";
+contract ProposalDAILTPayloadTest is ProtocolV2TestBase, TestWithExecutor {
 
     uint256 public constant LTV = 7500; // 77 -> 75
     uint256 public constant LIQUIDATION_THRESHOLD = 8700; // 90 -> 87
@@ -23,53 +21,27 @@ contract ProposalDAILTPayloadTest is Test {
 
     function setUp() public {
         vm.createSelectFork(vm.rpcUrl("mainnet"), 16182710);
+        _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR);
 
         // Deploy Payload
         proposalPayload = new ProposalPayload();
-
-        // Create Proposal
-        vm.prank(AAVE_WHALE);
-        proposalId = DeployMainnetProposal._deployMainnetProposal(
-            address(proposalPayload),
-            bytes32(0x5d0543d0e66abc240eceeae5ada6240d4d6402c2ccfe5ad521824dc36be71c45)
-        );
-        vm.stopPrank();
     }
 
     function testDAILTProposal() public {
-        require(proposalId != 0, "proposal deployed");
-        Market memory market = Market(
-            AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
-            AaveV2Ethereum.POOL,
-            AaveV2Ethereum.POOL_CONFIGURATOR,
-            AaveV2Ethereum.ORACLE,
-            AaveV2Ethereum.AAVE_PROTOCOL_DATA_PROVIDER
-                );
-        ReserveConfig[] memory allConfigsBefore = AaveV2Helpers.getReservesConfigs(
-            false,
-            market
-        );
-        ReserveConfig memory config = AaveV2Helpers.findReserveConfig(allConfigsBefore, DAISymbol, false);
 
-        GovHelpers.passVoteAndExecute(vm, proposalId);
-
-        ReserveConfig[] memory allConfigsAfter = AaveV2Helpers.getReservesConfigs(
-            false,
-            market
+        ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(
+            AaveV2Ethereum.POOL
         );
 
-        AaveV2Helpers._validateCountOfListings(0, allConfigsBefore, allConfigsAfter);
+        _executePayload(address(proposalPayload));
 
-        // ReserveConfig memory configAfter = AaveV2Helpers.findReserveConfig(allConfigsAfter, DAISymbol, false);
-        // console.log("ltv before", config.ltv);
-        // console.log("lq before", config.liquidationThreshold);
-        // console.log("lt before", config.liquidationBonus);
-        // console.log("ltv after", configAfter.ltv);
-        // console.log("lq after", configAfter.liquidationThreshold);
-        // console.log("lt after", configAfter.liquidationBonus);
+        ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV2Ethereum.POOL);
 
+        _validateCountOfListings(0, allConfigsBefore, allConfigsAfter);
+
+        ReserveConfig memory config = _findReserveConfig(allConfigsBefore, AaveV2EthereumAssets.DAI_UNDERLYING);
         config.ltv = LTV;
         config.liquidationThreshold = LIQUIDATION_THRESHOLD;
-        AaveV2Helpers._validateReserveConfig(config, allConfigsAfter);
+        _validateReserveConfig(config, allConfigsAfter);
     }
 }

@@ -12,6 +12,8 @@ test     :; forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -vv
 match    :; forge clean && forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} -vvv
 report   :; forge clean && forge test --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
 
+test-only :;  forge clean && forge test -vvv --match-contract ProposalMKRPayloadTest
+
 # Deploy and Verify Payload
 deploy-payload :; forge script script/DeployProposalPayload.s.sol:DeployProposalPayload --rpc-url ${RPC_ETHEREUM} --broadcast --private-key ${PRIVATE_KEY} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv
 verify-payload :; forge script script/DeployProposalPayload.s.sol:DeployProposalPayload --rpc-url ${RPC_ETHEREUM} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv

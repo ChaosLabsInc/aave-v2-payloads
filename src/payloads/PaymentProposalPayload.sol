@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import {IAaveEcosystemReserveController} from "../external/aave/IAaveEcosystemReserveController.sol";
-import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
+import {AaveV2Ethereum, AaveV2EthereumAssets} from "@aave-address-book/AaveV2Ethereum.sol";
 
 /**
  * @title Chaos <> AAVE Proposal
@@ -18,7 +18,6 @@ contract ProposalPayload {
 
     // Chaos Recipient address
     address public constant CHAOS_RECIPIENT = 0xbC540e0729B732fb14afA240aA5A047aE9ba7dF0;
-    address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;
 
     // ~500,000 aUSDC = $0.5 million
     // Small additional amount to handle remainder condition during streaming
@@ -41,7 +40,7 @@ contract ProposalPayload {
             AaveV2Ethereum.COLLECTOR,
             CHAOS_RECIPIENT,
             AUSDC_STREAM_AMOUNT,
-            AUSDC_TOKEN,
+            AaveV2EthereumAssets.USDC_A_TOKEN,
             block.timestamp + STREAMS_START,
             block.timestamp + STREAMS_END
         );

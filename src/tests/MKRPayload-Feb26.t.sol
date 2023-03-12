@@ -8,10 +8,8 @@ import "@forge-std/Test.sol";
 import {GovHelpers, TestWithExecutor} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum, AaveV2EthereumAssets} from "@aave-address-book/AaveV2Ethereum.sol";
 import {ProposalPayload} from "../payloads/MKRPayload-Feb26.sol";
-import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {ProtocolV2TestBase, ReserveConfig} from '@aave-helpers/ProtocolV2TestBase.sol';
-import {AaveMisc} from '@aave-address-book/AaveMisc.sol';
-import {AaveGovernanceV2} from '@aave-address-book/AaveGovernanceV2.sol';
+import {AaveGovernanceV2} from '@aave-address-book/AaveAddressBook.sol';
 
 contract ProposalMKRPayloadTest is ProtocolV2TestBase, TestWithExecutor {
     uint256 public constant MKR_LTV = 5900; ///  59%

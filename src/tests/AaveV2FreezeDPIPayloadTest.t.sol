@@ -26,7 +26,7 @@ contract AaveV2FreezeDPIPayloadTest is ProtocolV2TestBase, TestWithExecutor {
             allConfigsBefore,
             AaveV2EthereumAssets.DPI_UNDERLYING
         );
-        DPIConfig.borrowingEnabled = false;
+        DPIConfig.isFrozen = true;
 
         // 1. deploy l2 payload
         proposalPayload = new AaveV2FreezeDPIPayload();

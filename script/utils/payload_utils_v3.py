@@ -1,6 +1,5 @@
 from enum import Enum
 
-# from github import Github
 GIT_REPO_PATH = "https://github.com/Maltmark/aave-proposals"
 ASSET = "ASSET"
 DATA = "DATA"
